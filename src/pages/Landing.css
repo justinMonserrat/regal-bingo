@@ -1,0 +1,157 @@
+.landing-page {
+  min-height: 100vh;
+  background: radial-gradient(circle at top, rgba(255, 105, 0, 0.15), transparent 55%), #050505;
+  color: #ffffff;
+  padding-bottom: 3rem;
+}
+
+.landing-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 1.5rem 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  align-items: center;
+}
+
+.landing-logo-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-text {
+  max-width: 640px;
+}
+
+.season-tag {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  color: #ff8533;
+  margin-bottom: 0.5rem;
+}
+
+.landing-hero h1 {
+  font-size: clamp(2.5rem, 6vw, 3.75rem);
+  margin: 0;
+}
+
+.hero-subtext {
+  font-size: 1.1rem;
+  color: #dcdcdc;
+  margin: 0.75rem 0 1.5rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.hero-actions button {
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-actions .primary {
+  background: #ff6900;
+  color: #050505;
+}
+
+.hero-actions .secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.hero-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+}
+
+.landing-board {
+  padding: 0 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-header h2 {
+  margin: 0;
+  text-align: center;
+}
+
+.loading-pill {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+.board-note {
+  text-align: center;
+  color: #bfbfbf;
+  margin-top: 1rem;
+}
+
+.landing-prizes {
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  margin: 2rem auto;
+  text-align: center;
+  max-width: 900px;
+}
+
+.landing-prizes .prize-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.landing-prizes .prize-card {
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.landing-prizes .points {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ff8533;
+  margin-bottom: 0.5rem;
+}
+
+.landing-prizes .prize-note {
+  margin-top: 1rem;
+  color: #cfcfcf;
+  font-size: 0.95rem;
+}
+
+@media (min-width: 900px) {
+  .landing-hero {
+    max-width: 900px;
+  }
+
+  .landing-prizes .prize-cards {
+    flex-direction: row;
+  }
+
+  .landing-prizes .prize-card {
+    flex: 1;
+  }
+}
