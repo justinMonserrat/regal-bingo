@@ -445,7 +445,7 @@
 .manager-top-actions {
   display: flex;
   justify-content: center;
-  margin-bottom: 1rem;
+  margin: 1rem 0 1.5rem;
 }
 
 .manager-tools-header {

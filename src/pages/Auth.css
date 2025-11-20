@@ -95,6 +95,11 @@
   margin: 0 auto 1rem;
 }
 
+.auth-logo-centered {
+  margin-top: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
 .error-message {
   background: rgba(255, 0, 0, 0.1);
   border: 1px solid #ff0000;

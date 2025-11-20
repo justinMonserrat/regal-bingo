@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import Logo from '../components/Logo'
+import RegalLogo from '../assets/regal_logo_stacked_orange.png'
 import './Auth.css'
 
 function ResetPassword() {
@@ -181,7 +182,7 @@ function ResetPassword() {
     return (
         <div className="auth-container">
             <div className="auth-card">
-                <Logo size={120} />
+                <img src={RegalLogo} alt="Regal Logo" className="auth-logo auth-logo-centered" />
                 <h1 className="auth-title">Regal Bingo</h1>
                 <h2>Password Reset</h2>
                 {renderContent()}

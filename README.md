@@ -96,6 +96,8 @@ src/
   │   ├── Login.jsx            # Customer login page
   │   ├── ManagerLogin.jsx     # Manager login page
   │   ├── Dashboard.jsx        # Manager dashboard and tools
+  │   ├── EmailConfirmed.jsx   # Post-email confirmation screen
+  │   ├── ResetPassword.jsx    # Password reset flow
   │   ├── ManagerDashboard.jsx # Manager dashboard with search & toggle
   │   ├── Auth.css             # Authentication page styles
   │   └── Dashboard.css        # Dashboard page styles
