@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import RegalLogo from '../assets/regal_logo_stacked_orange.png'
 import { BINGO_SQUARES } from '../data/bingoSquares'
 import './Auth.css'
 
@@ -77,7 +78,7 @@ function Signup() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <img src="/src/assets/regal_logo_stacked_orange.png" alt="Regal Logo" className="auth-logo" />
+        <img src={RegalLogo} alt="Regal Logo" className="auth-logo" />
         <h1 className="auth-title">Regal Bingo</h1>
         <h2>Create Account</h2>
         {!isSupabaseConfigured && (

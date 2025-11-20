@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
+import RegalLogo from '../assets/regal_logo_stacked_orange.png'
 import './Auth.css'
 
 function Login() {
@@ -39,7 +40,7 @@ function Login() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <img src="/src/assets/regal_logo_stacked_orange.png" alt="Regal Logo" className="auth-logo" />
+        <img src={RegalLogo} alt="Regal Logo" className="auth-logo" />
         <h1 className="auth-title">Regal Bingo</h1>
         <h2>Log In</h2>
         <form onSubmit={handleLogin}>
@@ -75,6 +76,9 @@ function Login() {
             {loading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
+        <p className="auth-link">
+          <Link to="/reset-password">Forgot your password?</Link>
+        </p>
         <p className="auth-link">
           Don't have an account? <Link to="/signup">Sign up</Link>
         </p>

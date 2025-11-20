@@ -6,6 +6,8 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Landing from './pages/Landing'
+import EmailConfirmed from './pages/EmailConfirmed'
+import ResetPassword from './pages/ResetPassword'
 import { AuthProvider, useAuth } from './context/AuthContext'
 
 function App() {
@@ -57,6 +59,8 @@ function AppRoutes() {
           />
         }
       />
+      <Route path="/email-confirmed" element={<EmailConfirmed />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
