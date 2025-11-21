@@ -266,6 +266,13 @@ function Dashboard() {
           <button type="button" className="home-button" onClick={goHome}>
             Home
           </button>
+          <button 
+            type="button" 
+            className="review-submissions-button" 
+            onClick={() => navigate('/review-submissions')}
+          >
+            Review Completions
+          </button>
         </div>
         <div className="search-section">
           <div className="manager-tools-header">

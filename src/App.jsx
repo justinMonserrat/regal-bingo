@@ -8,6 +8,9 @@ import Dashboard from './pages/Dashboard'
 import Landing from './pages/Landing'
 import EmailConfirmed from './pages/EmailConfirmed'
 import ResetPassword from './pages/ResetPassword'
+import UploadProof from './pages/UploadProof'
+import ReviewSubmissions from './pages/ReviewSubmissions'
+import FAQ from './pages/FAQ'
 import { AuthProvider, useAuth } from './context/AuthContext'
 
 function App() {
@@ -50,6 +53,22 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/upload-proof"
+        element={
+          <ProtectedRoute>
+            <UploadProof />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/review-submissions"
+        element={
+          <ManagerRoute>
+            <ReviewSubmissions />
+          </ManagerRoute>
+        }
+      />
+      <Route
         path="/"
         element={
           <Landing
@@ -61,6 +80,7 @@ function AppRoutes() {
       />
       <Route path="/email-confirmed" element={<EmailConfirmed />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/faq" element={<FAQ />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
@@ -79,6 +99,15 @@ function ProtectedRoute({ children }) {
   if (loading) return <LoadingScreen />
   if (!supabaseReady) return <SupabaseMissing />
   if (!user) return <Navigate to="/login" replace />
+  return children
+}
+
+function ManagerRoute({ children }) {
+  const { loading, user, isManager, managerResolved, supabaseReady } = useAuth()
+  if (loading || !managerResolved) return <LoadingScreen />
+  if (!supabaseReady) return <SupabaseMissing />
+  if (!user) return <Navigate to="/login" replace />
+  if (!isManager) return <Navigate to="/dashboard" replace />
   return children
 }
 

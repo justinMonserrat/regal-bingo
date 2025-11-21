@@ -59,11 +59,56 @@ Managers can now log in at `/manager/login` and access every customer's board. I
 npm run dev
 ```
 
+## Proof Submission System
+
+### Features
+- **Upload Proof**: Users can upload photos/receipts as proof of completing bingo tasks
+- **Manager Review**: Managers can approve/reject submissions with image previews
+- **Automatic Updates**: Approved submissions automatically update the user's bingo board
+- **File Management**: Images are automatically deleted after approval to save storage space
+- **Expiration**: Submissions expire after 5 days if not reviewed
+
+### Setup Storage Bucket
+
+1. In your Supabase project, go to **Storage**
+2. Create a new bucket called `proof-images`
+3. Set the bucket to **Public** (for image previews)
+4. Add the following RLS policies to the `proof-images` bucket:
+
+```sql
+-- Allow users to upload their own images
+CREATE POLICY "Users can upload own images" ON storage.objects
+FOR INSERT WITH CHECK (auth.uid()::text = (storage.foldername(name))[1]);
+
+-- Allow users to view their own images
+CREATE POLICY "Users can view own images" ON storage.objects
+FOR SELECT USING (auth.uid()::text = (storage.foldername(name))[1]);
+
+-- Allow managers to view all images
+CREATE POLICY "Managers can view all images" ON storage.objects
+FOR SELECT USING (
+  EXISTS (
+    SELECT 1 FROM public.manager_roles
+    WHERE manager_roles.user_id = auth.uid()
+  )
+);
+
+-- Allow managers to delete images (for cleanup after approval)
+CREATE POLICY "Managers can delete images" ON storage.objects
+FOR DELETE USING (
+  EXISTS (
+    SELECT 1 FROM public.manager_roles
+    WHERE manager_roles.user_id = auth.uid()
+  )
+);
+```
+
 ## Database Schema
 
-The app uses two main tables:
+The app uses these main tables:
 
 - **users**: Stores user accounts with email and manager status
+- **proof_submissions**: Stores proof submissions with images, status, and metadata
 - **progress**: Stores Bingo board state with 15 boolean fields (square_1 through square_15)
 
 See `database-schema.sql` for the complete schema including Row Level Security policies.

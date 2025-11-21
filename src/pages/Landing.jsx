@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { BINGO_SQUARES } from '../data/bingoSquares'
 import { TILE_RULES } from '../data/rules'
 import Logo from '../components/Logo'
+import Footer from '../components/Footer'
 import useMediaQuery from '../hooks/useMediaQuery'
 import { MOBILE_COLUMNS, transposeSquares } from '../utils/boardLayout'
 import './Dashboard.css'
@@ -65,24 +66,24 @@ function Landing({ user, isManager, isSupabaseConfigured }) {
 
   const rowPrize = isWideGrid
     ? {
-      title: 'Five Across',
-      description: 'Complete any row of five squares to earn 10,000 Regal Crown Club points.',
-      points: '10,000 pts',
+      title: 'Complete One Row',
+      description: 'Complete any row of five squares to earn 5,000 Regal Crown Club points.',
+      points: '5,000 pts',
     }
     : {
-      title: 'Three Across',
+      title: 'Complete One Row',
       description: 'Complete any row of three squares to earn 5,000 Regal Crown Club points.',
       points: '5,000 pts',
     }
 
   const columnPrize = isWideGrid
     ? {
-      title: 'Three Down',
-      description: 'Complete any column of three squares to earn 5,000 Regal Crown Club points.',
-      points: '5,000 pts',
+      title: 'Complete One Column',
+      description: 'Complete any column of three squares to earn 10,000 Regal Crown Club points.',
+      points: '10,000 pts',
     }
     : {
-      title: 'Five Down',
+      title: 'Complete One Column',
       description: 'Complete any column of five squares to earn 10,000 Regal Crown Club points.',
       points: '10,000 pts',
     }
@@ -103,12 +104,12 @@ function Landing({ user, isManager, isSupabaseConfigured }) {
               </p>
             ) : (
               <p className="hero-subtext">
-                Welcome back, {user.email}!<br />Keep visiting to complete rows and columns for bonus Regal points.
+                Welcome back, {user.email}!<br /><br />Complete challenges to earn RCC points!
               </p>
             )
           ) : (
             <p className="hero-subtext">
-              Complete movie-going challenges to earn Regal Crown Club points this December.
+              Complete exciting movie theater challenges throughout December to earn valuable Regal Crown Club points and exclusive rewards.
             </p>
           )}
           <div className="hero-actions">
@@ -118,17 +119,25 @@ function Landing({ user, isManager, isSupabaseConfigured }) {
                   Go to Dashboard
                 </button>
               ) : (
-                <button
-                  className="primary"
-                  onClick={async () => {
-                    if (isSupabaseConfigured) {
-                      await supabase.auth.signOut()
-                    }
-                    navigate('/login')
-                  }}
-                >
-                  Log Out
-                </button>
+                <>
+                  <button
+                    className="primary"
+                    onClick={() => navigate('/upload-proof')}
+                  >
+                    Submit Challenge
+                  </button>
+                  <button
+                    className="secondary"
+                    onClick={async () => {
+                      if (isSupabaseConfigured) {
+                        await supabase.auth.signOut()
+                      }
+                      navigate('/login')
+                    }}
+                  >
+                    Log Out
+                  </button>
+                </>
               )
             ) : (
               <>
@@ -142,12 +151,37 @@ function Landing({ user, isManager, isSupabaseConfigured }) {
             )}
           </div>
           <div className="rules-callout">
-            <h3 style={{ textAlign: 'center' }}>Visit Rules</h3>
+            <h3 style={{ textAlign: 'center' }}>Quick Rules</h3>
             <ul>
               {TILE_RULES.map((rule) => (
                 <li key={rule}>{rule}</li>
               ))}
             </ul>
+            <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+              <button
+                onClick={() => navigate('/faq')}
+                style={{
+                  background: 'transparent',
+                  border: '2px solid #ff6900',
+                  color: '#ff6900',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '25px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  transition: 'all 0.3s'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.background = '#ff6900'
+                  e.target.style.color = '#000000'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.background = 'transparent'
+                  e.target.style.color = '#ff6900'
+                }}
+              >
+                View Full FAQ
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -170,14 +204,14 @@ function Landing({ user, isManager, isSupabaseConfigured }) {
             ))}
           </div>
           <p className="board-note">
-            Managers will check off each square when you complete a task during your visit.
+            Submit documentation for completed challenges - limit one challenge per visit. See FAQ for complete rules and restrictions.
           </p>
         </div>
 
       </section>
 
       <section className="landing-prizes">
-        <h2>Prizes</h2>
+        <h2>RCC Point Rewards</h2>
         <div className="prize-cards">
           <div className="prize-card">
             <div className="points">{rowPrize.points}</div>
@@ -189,9 +223,16 @@ function Landing({ user, isManager, isSupabaseConfigured }) {
             <p><strong>{columnPrize.title}</strong></p>
             <p>{columnPrize.description}</p>
           </div>
+          <div className="prize-card">
+            <div className="points">10,000 pts</div>
+            <p><strong>Complete Full Card</strong></p>
+            <p>Complete the entire bingo card to earn a bonus 10,000 RCC points (25,000 total).</p>
+          </div>
         </div>
-        <p className="prize-note">Points post directly to your Regal app and can be redeemed for snacks or tickets.</p>
+        <p className="prize-note">Points will be added to your RCC account after review. See FAQ for complete details and restrictions.</p>
       </section>
+
+      <Footer />
     </div>
   )
 }

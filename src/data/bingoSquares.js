@@ -2,7 +2,7 @@ export const BINGO_SQUARES = [
     // Row 1 (3 across)
     { field: 'square_1', label: 'Purchase Any Size Popcorn' },
     { field: 'square_2', label: 'See a Movie on a Weekday' },
-    { field: 'square_3', label: 'Follow Our Letterboxd' },
+    { field: 'square_3', label: 'See a Fathom Event Movie' },
     // Row 2
     { field: 'square_4', label: 'See a Mystery Movie' },
     { field: 'square_5', label: 'Purchase Any Ice Cream' },

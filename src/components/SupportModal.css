@@ -1,0 +1,39 @@
+.support-modal {
+  background: #000000;
+  border: 2px solid #ff6900;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.support-form {
+  padding: 1.5rem 2rem 2rem;
+}
+
+.subject-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #333333;
+  border-radius: 6px;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.subject-input:focus {
+  outline: none;
+  border-color: #ff6900;
+}
+
+@media (max-width: 768px) {
+  .support-form {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}

@@ -173,3 +173,69 @@ CREATE TRIGGER sync_manager_role_after_update
   AFTER UPDATE OF is_manager ON public.users
   FOR EACH ROW EXECUTE FUNCTION public.sync_manager_role();
 
+-- Proof submissions table
+CREATE TABLE IF NOT EXISTS proof_submissions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  task_field TEXT NOT NULL, -- e.g., 'square_1', 'square_2', etc.
+  task_label TEXT NOT NULL, -- Human-readable task name
+  message TEXT, -- Optional message from user
+  receipt_number TEXT, -- Optional receipt number
+  image_url TEXT NOT NULL, -- Supabase storage URL
+  image_path TEXT NOT NULL, -- Storage path for deletion
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL, -- Manager who reviewed
+  reviewed_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  expires_at TIMESTAMP WITH TIME ZONE DEFAULT (NOW() + INTERVAL '5 days') -- 5-day expiration
+);
+
+CREATE INDEX IF NOT EXISTS proof_submissions_user_idx ON proof_submissions(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS proof_submissions_status_idx ON proof_submissions(status, created_at DESC);
+CREATE INDEX IF NOT EXISTS proof_submissions_task_idx ON proof_submissions(task_field);
+CREATE INDEX IF NOT EXISTS proof_submissions_expires_idx ON proof_submissions(expires_at);
+
+-- Enable RLS for proof submissions
+ALTER TABLE proof_submissions ENABLE ROW LEVEL SECURITY;
+
+-- Users can view their own submissions
+DROP POLICY IF EXISTS "Users can view own submissions" ON proof_submissions;
+CREATE POLICY "Users can view own submissions" ON proof_submissions
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- Users can insert their own submissions
+DROP POLICY IF EXISTS "Users can insert own submissions" ON proof_submissions;
+CREATE POLICY "Users can insert own submissions" ON proof_submissions
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Managers can view all submissions
+DROP POLICY IF EXISTS "Managers can view all submissions" ON proof_submissions;
+CREATE POLICY "Managers can view all submissions" ON proof_submissions
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM manager_roles
+      WHERE manager_roles.user_id = auth.uid()
+    )
+  );
+
+-- Managers can update submission status
+DROP POLICY IF EXISTS "Managers can update submissions" ON proof_submissions;
+CREATE POLICY "Managers can update submissions" ON proof_submissions
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM manager_roles
+      WHERE manager_roles.user_id = auth.uid()
+    )
+  );
+
+-- Function to clean up expired submissions
+CREATE OR REPLACE FUNCTION public.cleanup_expired_submissions()
+RETURNS void AS $$
+BEGIN
+  -- Delete expired submissions (this would also trigger storage cleanup in the app)
+  DELETE FROM proof_submissions 
+  WHERE status = 'pending' 
+  AND expires_at < NOW();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
