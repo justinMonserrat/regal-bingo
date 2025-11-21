@@ -146,6 +146,40 @@ export async function getPendingSubmissions() {
   }
 }
 
+// Get all completed submissions (approved/rejected) for managers
+export async function getCompletedSubmissions() {
+  try {
+    console.log('Fetching completed submissions...')
+    
+    const { data, error } = await supabase
+      .from('proof_submissions')
+      .select(`
+        *,
+        users!proof_submissions_user_id_fkey(email),
+        reviewed_by_user:users!proof_submissions_reviewed_by_fkey(email)
+      `)
+      .in('status', ['approved', 'rejected'])
+      .order('reviewed_at', { ascending: false })
+    
+    console.log('Completed submissions query result:', { data, error })
+    
+    if (error) {
+      console.error('Database error fetching completed submissions:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      })
+      throw error
+    }
+    
+    return data || []
+  } catch (error) {
+    console.error('Fetch completed submissions error:', error)
+    return []
+  }
+}
+
 // Approve or reject submission (for managers)
 export async function reviewSubmission(submissionId, status, managerId) {
   if (!['approved', 'rejected'].includes(status)) {

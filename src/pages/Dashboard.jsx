@@ -6,6 +6,7 @@ import { BINGO_SQUARES } from '../data/bingoSquares'
 import Logo from '../components/Logo'
 import useMediaQuery from '../hooks/useMediaQuery'
 import { MOBILE_COLUMNS, transposeSquares } from '../utils/boardLayout'
+import { getUserSubmissions } from '../lib/submissions'
 import './Dashboard.css'
 
 function Dashboard() {
@@ -15,6 +16,7 @@ function Dashboard() {
   const [selectedUser, setSelectedUser] = useState(null)
   const [selectedProgress, setSelectedProgress] = useState(null)
   const [progressLogs, setProgressLogs] = useState([])
+  const [userSubmissions, setUserSubmissions] = useState([])
   const [managerLoading, setManagerLoading] = useState(false)
   const [managerError, setManagerError] = useState('')
   const [visitLocked, setVisitLocked] = useState(false)
@@ -42,6 +44,7 @@ function Dashboard() {
     setSelectedUser(null)
     setSelectedProgress(null)
     setProgressLogs([])
+    setUserSubmissions([])
     setVisitLocked(false)
     setLastVisitTime(null)
     setManagerError('')
@@ -72,6 +75,31 @@ function Dashboard() {
     } else {
       setVisitLocked(false)
       setLastVisitTime(null)
+    }
+  }
+
+  const loadUserSubmissions = async (userId) => {
+    if (!isManager || !userId) return
+    try {
+      const { data, error } = await supabase
+        .from('proof_submissions')
+        .select(`
+          *,
+          reviewed_by_user:users!proof_submissions_reviewed_by_fkey(email)
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Failed to load user submissions:', error)
+        setUserSubmissions([])
+        return
+      }
+
+      setUserSubmissions(data || [])
+    } catch (err) {
+      console.error('Error loading user submissions:', err)
+      setUserSubmissions([])
     }
   }
 
@@ -111,6 +139,7 @@ function Dashboard() {
 
       setSelectedProgress(progressData)
       await loadLogs(userData.id)
+      await loadUserSubmissions(userData.id)
     } catch (err) {
       setManagerError(err.message || 'Failed to find user')
     } finally {
@@ -345,6 +374,56 @@ function Dashboard() {
               <button type="button" onClick={resetSelection}>
                 Done
               </button>
+            </div>
+
+            <div className="user-submissions-section">
+              <h3>Task Submissions</h3>
+              {userSubmissions.length === 0 ? (
+                <p className="submissions-empty">No submissions found for this user.</p>
+              ) : (
+                <div className="submissions-list">
+                  {userSubmissions.map((submission) => (
+                    <div key={submission.id} className="submission-item">
+                      <div className="submission-header">
+                        <span className="submission-task">{submission.task_label}</span>
+                        <span className={`submission-status ${submission.status}`}>
+                          {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
+                        </span>
+                      </div>
+                      <div className="submission-details">
+                        <span className="submission-date">
+                          Submitted: {new Date(submission.created_at).toLocaleDateString()}
+                        </span>
+                        {submission.reviewed_at && (
+                          <span className="submission-reviewed">
+                            Reviewed: {new Date(submission.reviewed_at).toLocaleDateString()}
+                            {submission.reviewed_by_user?.email && ` by ${submission.reviewed_by_user.email}`}
+                          </span>
+                        )}
+                      </div>
+                      {submission.message && (
+                        <div className="submission-message">
+                          <strong>Message:</strong> {submission.message}
+                        </div>
+                      )}
+                      {submission.receipt_number && (
+                        <div className="submission-receipt">
+                          <strong>Receipt #:</strong> {submission.receipt_number}
+                        </div>
+                      )}
+                      {submission.image_url && (
+                        <div className="submission-image">
+                          <img 
+                            src={submission.image_url} 
+                            alt="Submission proof"
+                            style={{ maxWidth: '200px', maxHeight: '150px', objectFit: 'cover' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="visit-log-card">

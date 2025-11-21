@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
-import Footer from '../components/Footer'
 import SupportModal from '../components/SupportModal'
 import './FAQ.css'
 
@@ -215,8 +214,6 @@ function FAQ() {
           </div>
         </div>
       </div>
-
-      <Footer />
 
       <SupportModal
         isOpen={showSupportModal}

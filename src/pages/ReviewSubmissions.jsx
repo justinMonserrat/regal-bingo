@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
-import { getPendingSubmissions, reviewSubmission } from '../lib/submissions'
+import { getPendingSubmissions, getCompletedSubmissions, reviewSubmission } from '../lib/submissions'
 import Footer from '../components/Footer'
 import './ReviewSubmissions.css'
 
@@ -11,6 +11,8 @@ function ReviewSubmissions() {
     const navigate = useNavigate()
 
     const [submissions, setSubmissions] = useState([])
+    const [completedSubmissions, setCompletedSubmissions] = useState([])
+    const [activeTab, setActiveTab] = useState('pending')
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [processingId, setProcessingId] = useState(null)
@@ -42,9 +44,14 @@ function ReviewSubmissions() {
                 return
             }
 
-            const data = await getPendingSubmissions()
-            console.log('Loaded submissions:', data)
-            setSubmissions(data)
+            const [pendingData, completedData] = await Promise.all([
+                getPendingSubmissions(),
+                getCompletedSubmissions()
+            ])
+            console.log('Loaded pending submissions:', pendingData)
+            console.log('Loaded completed submissions:', completedData)
+            setSubmissions(pendingData)
+            setCompletedSubmissions(completedData)
         } catch (err) {
             console.error('Load submissions error:', {
                 message: err.message,
@@ -142,11 +149,29 @@ function ReviewSubmissions() {
         <div className="review-submissions-container">
             <div className="review-submissions-header">
                 <h1>Review Task Completions</h1>
+            </div>
+
+            <div className="back-button-container">
                 <button
                     onClick={() => navigate('/dashboard')}
-                    className="back-button"
+                    className="back-button orange"
                 >
                     Back to Dashboard
+                </button>
+            </div>
+
+            <div className="review-tabs">
+                <button
+                    className={`tab-button ${activeTab === 'pending' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('pending')}
+                >
+                    Pending Reviews ({submissions.length})
+                </button>
+                <button
+                    className={`tab-button ${activeTab === 'completed' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('completed')}
+                >
+                    Completed Reviews ({completedSubmissions.length})
                 </button>
             </div>
 
@@ -154,78 +179,152 @@ function ReviewSubmissions() {
 
             {loading ? (
                 <div className="loading-message">Loading submissions...</div>
-            ) : submissions.length === 0 ? (
-                <div className="no-submissions">
-                    <h2>No Pending Reviews</h2>
-                    <p>All caught up! There are no task completions waiting for review.</p>
-                </div>
+            ) : activeTab === 'pending' ? (
+                submissions.length === 0 ? (
+                    <div className="no-submissions">
+                        <h2>No Pending Reviews</h2>
+                        <p>All caught up! There are no task completions waiting for review.</p>
+                    </div>
+                ) : (
+                    <div className="submissions-grid">
+                        {submissions.map((submission) => (
+                            <div key={submission.id} className="submission-card">
+                                <div className="submission-header">
+                                    <h3>{submission.task_label}</h3>
+                                    <span className="submission-date">
+                                        {formatDate(submission.created_at)}
+                                    </span>
+                                </div>
+
+                                <div className="submission-user">
+                                    <strong>User:</strong> {submission.users.email}
+                                </div>
+
+                                {submission.receipt_number && (
+                                    <div className="submission-receipt">
+                                        <strong>Receipt #:</strong> {submission.receipt_number}
+                                    </div>
+                                )}
+
+                                {submission.message && (
+                                    <div className="submission-message">
+                                        <strong>Message:</strong>
+                                        <p>{submission.message}</p>
+                                    </div>
+                                )}
+
+                                <div className="submission-image">
+                                    <img
+                                        src={submission.image_url}
+                                        alt="Proof submission"
+                                        className="proof-image"
+                                        loading="lazy"
+                                    />
+                                </div>
+
+                                <div className="submission-expiry">
+                                    <span className={`expiry-time ${getTimeRemaining(submission.expires_at).includes('Expired') ? 'expired' : ''}`}>
+                                        {getTimeRemaining(submission.expires_at)}
+                                    </span>
+                                </div>
+
+                                <div className="submission-actions">
+                                    <button
+                                        onClick={() => handleReview(submission.id, 'rejected')}
+                                        disabled={processingId === submission.id}
+                                        className="reject-button"
+                                    >
+                                        {processingId === submission.id ? 'Processing...' : 'Reject'}
+                                    </button>
+                                    <button
+                                        onClick={() => handleReview(submission.id, 'approved')}
+                                        disabled={processingId === submission.id}
+                                        className="approve-button"
+                                    >
+                                        {processingId === submission.id ? 'Processing...' : 'Approve'}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )
             ) : (
-                <div className="submissions-grid">
-                    {submissions.map((submission) => (
-                        <div key={submission.id} className="submission-card">
-                            <div className="submission-header">
-                                <h3>{submission.task_label}</h3>
-                                <span className="submission-date">
-                                    {formatDate(submission.created_at)}
-                                </span>
-                            </div>
-
-                            <div className="submission-user">
-                                <strong>User:</strong> {submission.users.email}
-                            </div>
-
-                            {submission.receipt_number && (
-                                <div className="submission-receipt">
-                                    <strong>Receipt #:</strong> {submission.receipt_number}
+                // Completed submissions tab
+                completedSubmissions.length === 0 ? (
+                    <div className="no-submissions">
+                        <h2>No Completed Reviews</h2>
+                        <p>No reviews have been completed yet.</p>
+                    </div>
+                ) : (
+                    <div className="submissions-grid">
+                        {completedSubmissions.map((submission) => (
+                            <div key={submission.id} className="submission-card completed">
+                                <div className="submission-header">
+                                    <div className="user-info">
+                                        <strong>{submission.users?.email || 'Unknown User'}</strong>
+                                        <span className="submission-date">
+                                            Submitted: {new Date(submission.created_at).toLocaleDateString()}
+                                        </span>
+                                        <span className="review-date">
+                                            Reviewed: {new Date(submission.reviewed_at).toLocaleDateString()}
+                                        </span>
+                                        {submission.reviewed_by_user?.email && (
+                                            <span className="reviewer">
+                                                By: {submission.reviewed_by_user.email}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className={`status-badge ${submission.status}`}>
+                                        {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
+                                    </div>
                                 </div>
-                            )}
 
-                            {submission.message && (
-                                <div className="submission-message">
-                                    <strong>Message:</strong>
-                                    <p>{submission.message}</p>
+                                <div className="submission-content">
+                                    <div className="submission-details">
+                                        <div className="task-info">
+                                            <strong>Challenge:</strong> {submission.task_label}
+                                        </div>
+                                        {submission.message && (
+                                            <div className="message">
+                                                <strong>Message:</strong> {submission.message}
+                                            </div>
+                                        )}
+                                        {submission.receipt_number && (
+                                            <div className="receipt-number">
+                                                <strong>Receipt #:</strong> {submission.receipt_number}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="image-preview">
+                                        <img
+                                            src={submission.image_url}
+                                            alt="Submission proof"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none'
+                                                e.target.nextSibling.style.display = 'block'
+                                            }}
+                                        />
+                                        <div className="image-error" style={{ display: 'none' }}>
+                                            Image not available
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
-
-                            <div className="submission-image">
-                                <img
-                                    src={submission.image_url}
-                                    alt="Proof submission"
-                                    className="proof-image"
-                                    loading="lazy"
-                                />
                             </div>
+                        ))}
+                    </div>
+                )
+            )}
 
-                            <div className="submission-expiry">
-                                <span className={`expiry-time ${getTimeRemaining(submission.expires_at).includes('Expired') ? 'expired' : ''}`}>
-                                    {getTimeRemaining(submission.expires_at)}
-                                </span>
-                            </div>
-
-                            <div className="submission-actions">
-                                <button
-                                    onClick={() => handleReview(submission.id, 'rejected')}
-                                    disabled={processingId === submission.id}
-                                    className="reject-button"
-                                >
-                                    {processingId === submission.id ? 'Processing...' : 'Reject'}
-                                </button>
-                                <button
-                                    onClick={() => handleReview(submission.id, 'approved')}
-                                    disabled={processingId === submission.id}
-                                    className="approve-button"
-                                >
-                                    {processingId === submission.id ? 'Processing...' : 'Approve'}
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+            {activeTab === 'pending' && submissions.length > 0 && (
+                <div className="submissions-summary">
+                    <p>{submissions.length} submission{submissions.length !== 1 ? 's' : ''} pending review</p>
                 </div>
             )}
 
-            {submissions.length > 0 && (
+            {activeTab === 'completed' && completedSubmissions.length > 0 && (
                 <div className="submissions-summary">
-                    <p>{submissions.length} submission{submissions.length !== 1 ? 's' : ''} pending review</p>
+                    <p>{completedSubmissions.length} completed review{completedSubmissions.length !== 1 ? 's' : ''}</p>
                 </div>
             )}
 

@@ -7,13 +7,21 @@
 }
 
 .review-submissions-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    text-align: center;
+    margin-bottom: 1rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem;
+}
+
+.back-button-container {
+    text-align: center;
     margin-bottom: 2rem;
     max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
+    padding: 0 1rem;
 }
 
 .review-submissions-header h1 {
@@ -28,14 +36,93 @@
     color: #ffffff;
     border: none;
     padding: 0.75rem 1.5rem;
-    border-radius: 6px;
+    border-radius: 50px;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: all 0.3s;
+    font-size: 1rem;
 }
 
 .back-button:hover {
     background: #555555;
+    transform: translateY(-2px);
+}
+
+.back-button.orange {
+    background: #ff6900;
+    color: #ffffff;
+}
+
+.back-button.orange:hover {
+    background: #e55a00;
+    transform: translateY(-2px);
+}
+
+/* Tab Navigation */
+.review-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem;
+}
+
+.tab-button {
+    background: #333333;
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.tab-button:hover {
+    background: #555555;
+    transform: translateY(-2px);
+}
+
+.tab-button.active {
+    background: #ff6900;
+    color: #ffffff;
+}
+
+.tab-button.active:hover {
+    background: #e55a00;
+}
+
+/* Completed Submissions */
+.submission-card.completed {
+    opacity: 0.9;
+}
+
+.submission-card.completed .submission-header {
+    background: #1a1a1a;
+}
+
+.status-badge.approved {
+    background: #22c55e;
+    color: #ffffff;
+}
+
+.status-badge.rejected {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.review-date {
+    color: #888888;
+    font-size: 0.85rem;
+}
+
+.reviewer {
+    color: #ff6900;
+    font-size: 0.85rem;
+    font-weight: bold;
 }
 
 .loading-message {
