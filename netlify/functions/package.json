@@ -1,8 +1,0 @@
-{
-  "name": "regal-bingo-functions",
-  "version": "1.0.0",
-  "description": "Netlify functions for Regal Bingo email services",
-  "dependencies": {
-    "nodemailer": "^6.9.7"
-  }
-}

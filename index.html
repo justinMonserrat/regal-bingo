@@ -77,6 +77,23 @@
 
 <body>
   <div id="root"></div>
+
+  <!-- Hidden forms for Netlify Forms -->
+  <form name="bug-report" netlify hidden>
+    <input type="text" name="description" />
+    <input type="email" name="userEmail" />
+    <input type="text" name="browserInfo" />
+    <input type="text" name="url" />
+    <input type="text" name="timestamp" />
+  </form>
+
+  <form name="support-request" netlify hidden>
+    <input type="text" name="subject" />
+    <input type="text" name="message" />
+    <input type="email" name="userEmail" />
+    <input type="text" name="timestamp" />
+  </form>
+
   <script type="module" src="/src/main.jsx"></script>
 </body>
 
