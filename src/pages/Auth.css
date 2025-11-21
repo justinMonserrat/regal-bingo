@@ -61,6 +61,39 @@
   border-color: #ff6900;
 }
 
+.password-input-container {
+  position: relative;
+}
+
+.password-input-container input {
+  padding-right: 3rem;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s;
+}
+
+.password-toggle:hover {
+  color: #ff6900;
+}
+
+.password-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
 .auth-button {
   width: 100%;
   padding: 0.875rem;
