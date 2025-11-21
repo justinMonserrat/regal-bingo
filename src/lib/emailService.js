@@ -1,7 +1,7 @@
 // Email service for sending bug reports and support requests
 export async function sendBugReport({ description, userEmail, browserInfo, url }) {
   try {
-    const response = await fetch('/api/send-bug-report', {
+    const response = await fetch('/.netlify/functions/send-bug-report', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ export async function sendBugReport({ description, userEmail, browserInfo, url }
 
 export async function sendSupportRequest({ subject, message, userEmail }) {
   try {
-    const response = await fetch('/api/send-support-request', {
+    const response = await fetch('/.netlify/functions/send-support-request', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
